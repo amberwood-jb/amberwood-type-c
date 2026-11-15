@@ -3,6 +3,11 @@
 <head>
 <meta charset="utf-8">
 <script>document.documentElement.className+=" js"</script>
+<!-- ChatGPT Ads measurement pixel (counts WhatsApp leads from ChatGPT ads) -->
+<script>
+(function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var js=d.createElement(s);js.async=true;js.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(js,f);})(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");
+oaiq("init",{pixelId:"CWzJzNFjhMCzGE9jK8hPUh"});
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Amberwood Resort Residences | Type C 3+1 | Larkin, Johor Bahru</title>
 <meta name="description" content="Amberwood Resort Residences, Larkin Johor Bahru. Type C 872 sq ft, 3+1 bedrooms, 2 bathrooms. Type A & B fully sold. WhatsApp us for the latest price. 拉庆度假式公寓 C户型 3+1房，A、B户型已售罄。">
@@ -463,6 +468,7 @@ footer p{margin-bottom:10px;opacity:.9}
       </div>
       <details class="privacy" id="privacy"><summary><span class="en">Privacy notice</span><span class="zh">隐私声明</span></summary>
         <p><span class="en">The name and WhatsApp number you submit are used only to reply to your enquiry about Amberwood Resort Residences and to send you related project information. They are not sold or shared with unrelated third parties. You can ask for your details to be corrected or deleted at any time by messaging 011-5434 1880.</span><span class="zh">你提交的姓名和 WhatsApp 号码只用于回复你有关 Amberwood Resort Residences 的询问，以及发送相关项目资料，不会出售或提供给无关的第三方。你可以随时发信息到 011-5434 1880 要求更正或删除你的资料。</span></p>
+        <p><span class="en">This page uses OpenAI's ad measurement tool, which sets cookies to count how many visitors from ChatGPT ads contact us. Any contact details it reads are hashed (scrambled) in your browser before anything is sent.</span><span class="zh">本网页使用 OpenAI 的广告成效统计工具，它会设置 cookie，用来统计从 ChatGPT 广告进来的访客有多少联系我们。它读取到的联系资料会先在你的浏览器里加密（哈希处理）才发送。</span></p>
       </details>
     </div>
   </div>
@@ -612,9 +618,10 @@ footer p{margin-bottom:10px;opacity:.9}
     });
   }
   document.querySelectorAll(".lang button").forEach(function(b){b.addEventListener("click",function(){setLang(b.dataset.lang); try{localStorage.setItem("lang",lang)}catch(e){}})});
+  function trackLead(){ try{ if(window.oaiq) oaiq("measure","lead_created",{type:"customer_action"}); }catch(e){} }
   document.querySelectorAll(".wa-link").forEach(function(a){
     a.target="_blank"; a.rel="noopener";
-    a.addEventListener("click",function(){ if(window.gtag)gtag("event","whatsapp_click",{button:a.dataset.src,lang:lang}); if(window.fbq)fbq("track","Contact"); });
+    a.addEventListener("click",function(){ if(window.gtag)gtag("event","whatsapp_click",{button:a.dataset.src,lang:lang}); if(window.fbq)fbq("track","Contact"); trackLead(); });
   });
   setLang(lang);
 
@@ -644,7 +651,7 @@ footer p{margin-bottom:10px;opacity:.9}
       fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
         body:JSON.stringify({access_key:WEB3FORMS_KEY,subject:"New Amberwood lead: "+d.name,from_name:"Amberwood landing page",name:d.name,whatsapp:d.phone,language:lang,source:src||"-"})}).catch(function(){});
     }
-    if(window.gtag)gtag("event","generate_lead",{lang:lang}); if(window.fbq)fbq("track","Lead");
+    if(window.gtag)gtag("event","generate_lead",{lang:lang}); if(window.fbq)fbq("track","Lead"); trackLead();
     document.getElementById("doneWa").href=url;
     form.hidden=true; form.nextElementSibling.hidden=false;
   });
