@@ -449,6 +449,7 @@ footer p{margin-bottom:10px;opacity:.9}
       <h2 class="anim up"><span class="en">Register Your Interest Now</span><span class="zh">立即登记</span></h2>
       <p class="lead anim fade d5"><span class="en">Fill in the form and we'll WhatsApp you the Type C price list, the units still available and a show-unit viewing slot.</span><span class="zh">填写表格，我们会通过 WhatsApp 发给你 C户型价格表、剩余单位，并安排参观样板房。</span></p>
       <form id="regForm" novalidate>
+        <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
         <label class="fld"><span class="lb"><span class="en">Name</span><span class="zh">姓名</span> <i>*</i></span>
           <input name="name" type="text" autocomplete="name" required maxlength="80"></label>
         <label class="fld"><span class="lb"><span class="en">WhatsApp Number</span><span class="zh">WhatsApp 号码</span> <i>*</i></span>
@@ -467,7 +468,7 @@ footer p{margin-bottom:10px;opacity:.9}
         <div class="num"><a href="tel:+601154341880" style="text-decoration:none">011-5434 1880</a></div>
       </div>
       <details class="privacy" id="privacy"><summary><span class="en">Privacy notice</span><span class="zh">隐私声明</span></summary>
-        <p><span class="en">The name and WhatsApp number you submit are used only to reply to your enquiry about Amberwood Resort Residences and to send you related project information. They are not sold or shared with unrelated third parties. You can ask for your details to be corrected or deleted at any time by messaging 011-5434 1880.</span><span class="zh">你提交的姓名和 WhatsApp 号码只用于回复你有关 Amberwood Resort Residences 的询问，以及发送相关项目资料，不会出售或提供给无关的第三方。你可以随时发信息到 011-5434 1880 要求更正或删除你的资料。</span></p>
+        <p><span class="en">The name and WhatsApp number you submit are used only to reply to your enquiry about Amberwood Resort Residences and to send you related project information. They are kept in our private Google account and not sold or shared with unrelated third parties. You can ask for your details to be corrected or deleted at any time by messaging 011-5434 1880.</span><span class="zh">你提交的姓名和 WhatsApp 号码只用于回复你有关 Amberwood Resort Residences 的询问，以及发送相关项目资料，资料保存在我们私人的 Google 账户里，不会出售或提供给无关的第三方。你可以随时发信息到 011-5434 1880 要求更正或删除你的资料。</span></p>
         <p><span class="en">This page uses OpenAI's ad measurement tool, which sets cookies to count how many visitors from ChatGPT ads contact us. Any contact details it reads are hashed (scrambled) in your browser before anything is sent.</span><span class="zh">本网页使用 OpenAI 的广告成效统计工具，它会设置 cookie，用来统计从 ChatGPT 广告进来的访客有多少联系我们。它读取到的联系资料会先在你的浏览器里加密（哈希处理）才发送。</span></p>
       </details>
     </div>
@@ -625,9 +626,9 @@ footer p{margin-bottom:10px;opacity:.9}
   });
   setLang(lang);
 
-  // Register form. Leads always go to WhatsApp with the details filled in.
-  // Optional: paste a Web3Forms access key (web3forms.com, free) to also get every lead by email.
-  var WEB3FORMS_KEY="";
+  // Register form. Leads go to WhatsApp with the details filled in, and are also
+  // saved to the owner's Google Sheet + emailed (Google Apps Script "Amberwood Lead Receiver").
+  var LEAD_URL="https://script.google.com/macros/s/AKfycbwBF_kDwF5pNZk6KWKUo8raWrS-NNuDFsw7wK2AFGqPx8Tjyu-H0uc-7cO9Zk65OY2u/exec";
   var form=document.getElementById("regForm"), err=form.querySelector(".err");
   var T={en:{name:"Please enter your name.",phone:"Please enter a valid Malaysian mobile number, e.g. 012-345 6789.",consent:"Please tick the consent box to continue.",
              msg:function(d){return "Hi, I'd like to register my interest in Amberwood Type C (3+1).\nName: "+d.name+"\nWhatsApp: "+d.phone+"\nPlease send me the latest price & availability."}},
@@ -645,12 +646,11 @@ footer p{margin-bottom:10px;opacity:.9}
     if(problem){err.textContent=problem; if(field.closest(".fld"))field.closest(".fld").classList.add("bad"); field.focus(); return;}
     err.textContent="";
     var text=t.msg(d)+refTag(), url="https://wa.me/"+PHONE+"?text="+encodeURIComponent(text);
+    // save the lead first (keepalive lets it finish even if the page navigates to WhatsApp)
+    try{ fetch(LEAD_URL,{method:"POST",mode:"no-cors",keepalive:true,headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({name:d.name,phone:d.phone,lang:lang,src:src||"",page:location.pathname+location.search,website:f.website?f.website.value:""})}).catch(function(){}); }catch(x){}
     var win=window.open(url,"_blank"); // opened inside the click so it isn't blocked
     if(!win) location.href=url;
-    if(WEB3FORMS_KEY){
-      fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
-        body:JSON.stringify({access_key:WEB3FORMS_KEY,subject:"New Amberwood lead: "+d.name,from_name:"Amberwood landing page",name:d.name,whatsapp:d.phone,language:lang,source:src||"-"})}).catch(function(){});
-    }
     if(window.gtag)gtag("event","generate_lead",{lang:lang}); if(window.fbq)fbq("track","Lead"); trackLead();
     document.getElementById("doneWa").href=url;
     form.hidden=true; form.nextElementSibling.hidden=false;
